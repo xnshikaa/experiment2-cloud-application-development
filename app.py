@@ -1,98 +1,149 @@
-from flask import Flask, request, jsonify, render_template
-from flask_cors import CORS
-import csv
-from datetime import datetime
-import os
+from flask import Flask
 
 app = Flask(__name__)
-CORS(app)
 
-PATH = 'all excels/'
-##> ------ Karthik Sarode : karthik.sarode23@gmail.com - UI for excel files ------
-@app.route('/')
+@app.route("/")
 def home():
-    """Displays the home page of the application."""
-    return render_template('index.html')
+    return """
+    <html>
+    <head>
+        <title>Anshika Gupta | AI Engineer</title>
+        <style>
+            body{
+                font-family:Arial, sans-serif;
+                background:#111827;
+                color:white;
+                margin:50px;
+                line-height:1.6;
+            }
 
-@app.route('/applied-jobs', methods=['GET'])
-def get_applied_jobs():
-    '''
-    Retrieves a list of applied jobs from the applications history CSV file.
-    
-    Returns a JSON response containing a list of jobs, each with details such as 
-    Job ID, Title, Company, HR Name, HR Link, Job Link, External Job link, and Date Applied.
-    
-    If the CSV file is not found, returns a 404 error with a relevant message.
-    If any other exception occurs, returns a 500 error with the exception message.
-    '''
+            h1{
+                color:#60a5fa;
+            }
 
-    try:
-        jobs = []
-        with open(PATH + 'all_applied_applications_history.csv', 'r', encoding='utf-8') as file:
-            reader = csv.DictReader(file)
-            for row in reader:
-                jobs.append({
-                    'Job_ID': row['Job ID'],
-                    'Title': row['Title'],
-                    'Company': row['Company'],
-                    'HR_Name': row['HR Name'],
-                    'HR_Link': row['HR Link'],
-                    'Job_Link': row['Job Link'],
-                    'External_Job_link': row['External Job link'],
-                    'Date_Applied': row['Date Applied']
-                })
-        return jsonify(jobs)
-    except FileNotFoundError:
-        return jsonify({"error": "No applications history found"}), 404
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+            h2{
+                color:#93c5fd;
+                margin-top:30px;
+            }
 
-@app.route('/applied-jobs/<job_id>', methods=['PUT'])
-def update_applied_date(job_id):
+            .card{
+                background:#1f2937;
+                padding:20px;
+                border-radius:10px;
+                margin-top:15px;
+            }
+
+            ul{
+                margin-left:20px;
+            }
+
+            a{
+                color:#60a5fa;
+                text-decoration:none;
+            }
+        </style>
+    </head>
+
+    <body>
+
+        <h1>Anshika Gupta</h1>
+        <h3>AI Engineer | Full Stack Developer | AI & ML Student</h3>
+
+        <div class="card">
+            <h2>About Me</h2>
+            <p>
+                Third-year B.Tech Computer Science (AI & ML) student at
+                ATLAS SkillTech University with experience building
+                enterprise AI systems, full-stack applications,
+                production backend services, and intelligent automation.
+            </p>
+        </div>
+
+        <div class="card">
+            <h2>Education</h2>
+            <p>
+                B.Tech Computer Science (AI & ML)<br>
+                ATLAS SkillTech University<br>
+                CGPA: 9.55
+            </p>
+        </div>
+
+        <div class="card">
+            <h2>Experience</h2>
+
+            <h3>BWE Studio</h3>
+
+            <ul>
+                <li>Built enterprise AI platforms including Council and REGOS</li>
+                <li>Worked with React, Next.js, Supabase and PostgreSQL</li>
+                <li>Implemented authentication, backend APIs and AI integrations</li>
+                <li>Integrated payment systems and deployed Android applications</li>
+            </ul>
+
+            <h3>Unicornis AI</h3>
+
+            <ul>
+                <li>Optimized Text-to-Speech inference latency</li>
+                <li>Worked with ONNX Runtime, FastAPI and streaming pipelines</li>
+            </ul>
+
+        </div>
+
+        <div class="card">
+
+            <h2>Projects</h2>
+
+            <ul>
+                <li>Council – Enterprise Multi-Agent AI Platform</li>
+                <li>REGOS – AI Regulatory Intelligence Platform</li>
+                <li>TechMentor AI</li>
+                <li>PullUp Ride Sharing App</li>
+                <li>WHO Health Digital Twin</li>
+                <li>ExoDetect</li>
+            </ul>
+
+        </div>
+
+        <div class="card">
+
+            <h2>Skills</h2>
+
+            <p>
+
+            Python • C++ • Java • React • Next.js • TypeScript •
+            FastAPI • Flask • Django • PostgreSQL • Firebase •
+            Supabase • Docker • AWS • OpenAI API • Claude • Gemini •
+            RAG • AI Agents • Machine Learning • Computer Vision
+
+            </p>
+
+        </div>
+
+        <div class="card">
+
+            <h2>Achievements</h2>
+
+            <ul>
+                <li>Springer Research Publication</li>
+                <li>IEEE YESIST12 Finalist</li>
+                <li>Stanford CS231N Coursework</li>
+                <li>Daniel Bourke Deep Learning (PyTorch)</li>
+            </ul>
+
+        </div>
+
+        <div class="card">
+
+            <h2>Contact</h2>
+
+            <p>Email: anshikaa.akg19@gmail.com</p>
+            <p>Location: Mumbai, India</p>
+
+        </div>
+
+    </body>
+    </html>
     """
-    Updates the 'Date Applied' field of a job in the applications history CSV file.
 
-    Args:
-        job_id (str): The Job ID of the job to be updated.
-
-    Returns:
-        A JSON response with a message indicating success or failure of the update
-        operation. If the job is not found, returns a 404 error with a relevant
-        message. If any other exception occurs, returns a 500 error with the
-        exception message.
-    """
-    try:
-        data = []
-        csvPath = PATH + 'all_applied_applications_history.csv'
-        
-        if not os.path.exists(csvPath):
-            return jsonify({"error": f"CSV file not found at {csvPath}"}), 404
-            
-        # Read current CSV content
-        with open(csvPath, 'r', encoding='utf-8') as file:
-            reader = csv.DictReader(file)
-            fieldNames = reader.fieldnames
-            found = False
-            for row in reader:
-                if row['Job ID'] == job_id:
-                    row['Date Applied'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                    found = True
-                data.append(row)
-        
-        if not found:
-            return jsonify({"error": f"Job ID {job_id} not found"}), 404
-
-        with open(csvPath, 'w', encoding='utf-8', newline='') as file:
-            writer = csv.DictWriter(file, fieldnames=fieldNames)
-            writer.writeheader()
-            writer.writerows(data)
-        
-        return jsonify({"message": "Date Applied updated successfully"}), 200
-    except Exception as e:
-        print(f"Error updating applied date: {str(e)}")  # Debug log
-        return jsonify({"error": str(e)}), 500
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(debug=True)
-
-##<
